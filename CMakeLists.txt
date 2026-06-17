@@ -142,6 +142,19 @@ set (MacPList "<plist version=\"1.0\">
 
 function(sono_add_custom_plugin_target target_name product_name formats is_instrument plugincode)
 
+    set(_talent_mode OFF)
+    foreach(_extra_arg IN LISTS ARGN)
+        if(_extra_arg STREQUAL "TALENT_MODE")
+            set(_talent_mode ON)
+        endif()
+    endforeach()
+
+    if(_talent_mode)
+        set(_bundle_id "com.Sonosaurus.SonoBusTalent")
+    else()
+        set(_bundle_id "com.Sonosaurus.SonoBus")
+    endif()
+
    if (is_instrument)
         set (vst3cats Instrument Network)
         set (vst2cat "kPlugCategSynth")
@@ -156,7 +169,7 @@ function(sono_add_custom_plugin_target target_name product_name formats is_instr
         NEEDS_MIDI_OUTPUT TRUE
         EDITOR_WANTS_KEYBOARD_FOCUS TRUE
         COMPANY_NAME "Sonosaurus"
-        BUNDLE_ID "com.Sonosaurus.SonoBus"
+        BUNDLE_ID "${_bundle_id}"
         MICROPHONE_PERMISSION_ENABLED TRUE
         
         ICON_BIG "images/sonobus_icon_mac_1024.png"
@@ -234,6 +247,10 @@ function(sono_add_custom_plugin_target target_name product_name formats is_instr
         list (APPEND PlatSourceFiles  Source/CrossPlatformUtilsLinux.cpp)
 	list ( APPEND PLAT_COMPILE_DEFS
 		JUCE_USE_MP3AUDIOFORMAT=1 )
+    endif()
+
+    if(_talent_mode)
+        list(APPEND PLAT_COMPILE_DEFS SONOBUS_TALENT_MODE=1)
     endif()
 
 
@@ -321,6 +338,7 @@ function(sono_add_custom_plugin_target target_name product_name formats is_instr
         Source/SonobusPluginEditor.h
         Source/SonobusPluginProcessor.cpp
         Source/SonobusPluginProcessor.h
+        Source/SonobusAppMode.h
         Source/SonobusTypes.h
         Source/SuggestNewGroupView.cpp
         Source/SuggestNewGroupView.h
@@ -620,8 +638,14 @@ function(sono_add_custom_plugin_target target_name product_name formats is_instr
             
 endfunction()
 
+option(SONOBUS_BUILD_TALENT "Build SonoBus Talent standalone app" OFF)
+
 # most of the targets
 sono_add_custom_plugin_target(SonoBus SonoBus "${FormatsToBuild}" FALSE  "NBus")
+
+if(SONOBUS_BUILD_TALENT)
+    sono_add_custom_plugin_target(SonoBusTalent "SonoBus Talent" "Standalone" FALSE "TBus" TALENT_MODE)
+endif()
 
 # Mobile targets
 #sono_add_custom_plugin_target(SonoBusMobile "AUv3 Standalone" FALSE "NBus")

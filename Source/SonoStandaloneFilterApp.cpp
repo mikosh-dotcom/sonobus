@@ -58,6 +58,7 @@ extern juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 #include "SonoLookAndFeel.h"
 
 #include "SonobusPluginEditor.h"
+#include "SonobusAppMode.h"
 
 #if JUCE_ANDROID
 #include "android/SonoBusActivity.h"
@@ -112,7 +113,13 @@ public:
 #endif
     }
 
-    const String getApplicationName() override              { return JucePlugin_Name; }
+    const String getApplicationName() override
+    {
+        if (SonobusAppMode::isTalentMode())
+            return "SonoBus Talent";
+
+        return JucePlugin_Name;
+    }
     const String getApplicationVersion() override           { return JucePlugin_VersionString; }
     bool moreThanOneInstanceAllowed() override              { return true; }
 

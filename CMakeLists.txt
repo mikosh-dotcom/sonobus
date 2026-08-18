@@ -13,6 +13,7 @@ if (WIN32)
     #set (CMAKE_GENERATOR_TOOLSET ClangCL)
     #static linking in Windows
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    include_directories("C:/SDKs/ASIOSDK/common")
 endif()
 
 # If we are compiling for Mac OS we want to target OS versions down to 10.9
